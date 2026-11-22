@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ÜgyPont — Nemzeti ügyfélszolgálati platform</title>
+<meta name="description" content="ÜgyPont: az állami ügyintézés egyablakos, közérthető felülete. Okmányok, adóügyek, vállalkozás és családtámogatás egy helyen.">
+<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; script-src 'self' 'unsafe-inline';">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --jet-black:#122C34;
+    --yale-blue:#1D3C5E;
+    --royal-azure:#3658BF;
+    --azure-hover:#2A4699;
+    --pale-sky:#CCE5F5;
+    --pearl-aqua:#7DDEDA;
+    --white:#FFFFFF;
+    --ink:#132229;
+    --ink-soft:#3E5866;
+    --border-soft:rgba(18,44,52,0.12);
+    --font-display:'IBM Plex Serif', Georgia, serif;
+    --font-body:'IBM Plex Sans', -apple-system, Segoe UI, sans-serif;
+    --font-mono:'IBM Plex Mono', 'Courier New', monospace;
+    --max:78rem;
+  }
+
+  *,*::before,*::after{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto;}
+    *,*::before,*::after{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
+  }
+
+  body{
+    margin:0;
+    font-family:var(--font-body);
+    color:var(--ink);
+    background:var(--white);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.55;
+  }
+
+  h1,h2,h3{font-family:var(--font-display); color:var(--jet-black); margin:0; font-weight:600;}
+  p{margin:0;}
+  a{color:inherit;}
+  ul{list-style:none; margin:0; padding:0;}
+  button{font-family:inherit;}
+
+  .sr-only{position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;}
+
+  .skip-link{
+    position:absolute; left:1rem; top:-3rem;
+    background:var(--jet-black); color:var(--white);
+    padding:0.75rem 1.25rem; border-radius:0.25rem;
+    font-size:0.9rem; z-index:200; transition:top 0.15s ease;
+    text-decoration:none;
+  }
+  .skip-link:focus{top:1rem;}
+
+  :focus-visible{outline:3px solid var(--pearl-aqua); outline-offset:2px;}
+
+  .tag-code{
+    font-family:var(--font-mono);
+    font-size:0.72rem;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--royal-azure);
+    display:inline-flex;
+    align-items:center;
+    gap:0.4em;
+    margin:0 0 0.9rem 0;
+  }
+  .tag-code::before{content:"";width:0.5em;height:0.5em;background:var(--pearl-aqua);border-radius:1px;display:inline-block;}
+
+  /* ---------- Utility bar ---------- */
+  .utility-bar{background:var(--jet-black); color:var(--pale-sky); font-size:0.82rem;}
+  .utility-bar__inner{
+    max-width:var(--max); margin:0 auto; padding:0.5rem 1.5rem;
+    display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap;
+  }
+  .utility-bar__inner span{opacity:0.85;}
+  .utility-nav{display:flex; gap:1.1rem;}
+  .utility-nav a{text-decoration:none; color:var(--pale-sky); opacity:0.85;}
+  .utility-nav a:hover{opacity:1; text-decoration:underline;}
+
+  /* ---------- Header ---------- */
+  .site-header{
+    background:var(--white);
+    border-bottom:1px solid var(--border-soft);
+    position:sticky; top:0; z-index:100;
+  }
+  .site-header__inner{
+    max-width:var(--max); margin:0 auto; padding:0.9rem 1.5rem;
+    display:flex; align-items:center; gap:2rem;
+  }
+  .logo{display:flex; align-items:center; gap:0.75rem; text-decoration:none; margin-right:auto;}
+  .logo svg{flex-shrink:0;}
+  .logo__text{display:flex; flex-direction:column; line-height:1.15;}
+  .logo__text strong{font-family:var(--font-display); font-size:1.35rem; color:var(--jet-black); font-weight:600;}
+  .logo__text small{font-size:0.7rem; color:var(--ink-soft); letter-spacing:0.02em;}
+
+  .main-nav{display:flex; gap:1.75rem;}
+  .main-nav a{text-decoration:none; color:var(--ink); font-size:0.96rem; font-weight:500; padding:0.4rem 0; border-bottom:2px solid transparent;}
+  .main-nav a:hover{border-bottom-color:var(--royal-azure); color:var(--royal-azure);}
+
+  .btn{
+    font-family:var(--font-body); font-weight:600; font-size:0.92rem;
+    padding:0.65rem 1.3rem; border-radius:0.3rem; border:1.5px solid transparent;
+    cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; gap:0.5rem;
+    transition:background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .btn-primary{background:var(--royal-azure); color:var(--white);}
+  .btn-primary:hover{background:var(--azure-hover);}
+  .btn-outline{background:transparent; border-color:var(--jet-black); color:var(--jet-black);}
+  .btn-outline:hover{background:var(--jet-black); color:var(--white);}
+
+  .nav-toggle{
+    display:none; background:none; border:1.5px solid var(--border-soft); border-radius:0.3rem;
+    padding:0.5rem 0.7rem; cursor:pointer;
+  }
+  .nav-toggle span, .nav-toggle span::before, .nav-toggle span::after{
+    content:""; display:block; width:1.3rem; height:2px; background:var(--jet-black);
+    position:relative; transition:transform 0.15s ease;
+  }
+  .nav-toggle span::before{position:absolute; top:-0.4rem;}
+  .nav-toggle span::after{position:absolute; top:0.4rem;}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    position:relative; overflow:hidden;
+    background:linear-gradient(160deg, var(--yale-blue) 0%, var(--jet-black) 78%);
+    color:var(--white);
+    padding:clamp(3.5rem, 6vw, 6rem) 1.5rem clamp(3.5rem, 7vw, 7rem);
+  }
+  .hero::after{
+    content:"";
+    position:absolute; width:38rem; height:38rem; border-radius:50%;
+    background:radial-gradient(circle, rgba(125,222,218,0.28) 0%, rgba(125,222,218,0) 68%);
+    top:-14rem; right:-10rem; pointer-events:none;
+  }
+  .hero__inner{max-width:var(--max); margin:0 auto; position:relative; z-index:1;}
+  .hero__inner > *{max-width:44rem;}
+  .hero .tag-code{color:var(--pearl-aqua);}
+  .hero .tag-code::before{background:var(--pearl-aqua);}
+  .hero h1{
+    color:var(--white);
+    font-size:clamp(2.1rem, 3.4vw + 1rem, 3.4rem);
+    line-height:1.12; letter-spacing:-0.01em; font-weight:600;
+    margin-bottom:1.1rem;
+  }
+  .hero h1 .accent{color:var(--pearl-aqua);}
+  .hero__lede{
+    font-size:clamp(1.05rem, 1vw + 0.9rem, 1.25rem);
+    color:var(--pale-sky); max-width:34rem; margin-bottom:2.1rem;
+  }
+
+  .hero__search{display:flex; gap:0.6rem; max-width:34rem; margin-bottom:1.1rem;}
+  .hero__search input{
+    flex:1; padding:0.9rem 1.1rem; border-radius:0.35rem; border:none;
+    font-family:var(--font-body); font-size:1rem; color:var(--ink);
+  }
+  .hero__search input::placeholder{color:var(--ink-soft);}
+  .hero__search button{
+    background:var(--royal-azure); color:var(--white); border:none; border-radius:0.35rem;
+    padding:0 1.4rem; font-weight:600; cursor:pointer; font-size:0.96rem;
+    transition:background 0.15s ease;
+  }
+  .hero__search button:hover{background:var(--azure-hover);}
+
+  .hero__quicklinks{display:flex; flex-wrap:wrap; gap:0.6rem 1.1rem; align-items:center; font-size:0.9rem;}
+  .hero__quicklinks span{color:var(--pale-sky); opacity:0.75;}
+  .hero__quicklinks a{color:var(--pale-sky); text-decoration:underline; text-underline-offset:0.2em; text-decoration-color:rgba(204,229,245,0.45);}
+  .hero__quicklinks a:hover{color:var(--pearl-aqua); text-decoration-color:var(--pearl-aqua);}
+
+  /* ---------- Section shell ---------- */
+  section{padding:clamp(3rem, 5vw, 5rem) 1.5rem;}
+  .section__inner{max-width:var(--max); margin:0 auto;}
+  .section__head{max-width:38rem; margin-bottom:2.5rem;}
+  .section__head h2{font-size:clamp(1.65rem, 2vw + 1rem, 2.35rem); margin-bottom:0.7rem;}
+  .section__head p{color:var(--ink-soft); font-size:1.05rem;}
+
+  /* ---------- Services ---------- */
+  .services{background:var(--white);}
+  .services__grid{
+    display:grid; grid-template-columns:repeat(auto-fill, minmax(15.5rem, 1fr)); gap:1.25rem;
+  }
+  .service-card{
+    border:1px solid var(--border-soft); border-radius:0.5rem; padding:1.6rem;
+    background:var(--white); transition:border-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+    display:flex; flex-direction:column;
+  }
+  .service-card:hover{border-color:var(--royal-azure); transform:translateY(-2px); box-shadow:0 10px 24px -16px rgba(18,44,52,0.35);}
+  .service-card h3{font-size:1.15rem; margin-bottom:0.55rem;}
+  .service-card p{color:var(--ink-soft); font-size:0.94rem; flex-grow:1; margin-bottom:1rem;}
+  .service-card .card-link{font-size:0.9rem; font-weight:600; color:var(--royal-azure); text-decoration:none; display:inline-flex; align-items:center; gap:0.35rem;}
+  .service-card .card-link:hover{text-decoration:underline;}
+
+  /* ---------- Principles ---------- */
+  .principles{background:var(--pale-sky);}
+  .principles__grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(15rem, 1fr)); gap:2.5rem;}
+  .principles__item .tag-num{
+    font-family:var(--font-mono); font-size:0.78rem; color:var(--yale-blue); opacity:0.65; display:block; margin-bottom:0.5rem;
+  }
+  .principles__item h3{font-size:1.2rem; margin-bottom:0.5rem;}
+  .principles__item p{color:var(--ink-soft); font-size:0.96rem;}
+
+  /* ---------- News ---------- */
+  .news{background:var(--white);}
+  .news__list{display:flex; flex-direction:column;}
+  .news__item{
+    display:grid; grid-template-columns:9rem 1fr; gap:1.5rem; padding:1.6rem 0;
+    border-top:1px solid var(--border-soft);
+  }
+  .news__item:last-child{border-bottom:1px solid var(--border-soft);}
+  .news__item time{font-family:var(--font-mono); font-size:0.85rem; color:var(--ink-soft); padding-top:0.15rem;}
+  .news__item h3{font-size:1.1rem; margin-bottom:0.4rem;}
+  .news__item p{color:var(--ink-soft); font-size:0.95rem;}
+
+  /* ---------- CTA band ---------- */
+  .cta-band{
+    background:var(--royal-azure); color:var(--white);
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1.5rem;
+  }
+  .cta-band__inner{
+    max-width:var(--max); margin:0 auto; width:100%;
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:1.5rem;
+  }
+  .cta-band h2{color:var(--white); font-size:clamp(1.4rem, 1.6vw + 1rem, 1.9rem); max-width:28rem;}
+  .cta-band .btn-outline{border-color:var(--white); color:var(--white);}
+  .cta-band .btn-outline:hover{background:var(--white); color:var(--royal-azure);}
+
+  /* ---------- Footer ---------- */
+  .site-footer{background:var(--jet-black); color:var(--pale-sky); padding:3.5rem 1.5rem 1.5rem;}
+  .footer__grid{
+    max-width:var(--max); margin:0 auto;
+    display:grid; grid-template-columns:1.3fr repeat(3, 1fr); gap:2.5rem;
+    padding-bottom:2.5rem; border-bottom:1px solid rgba(204,229,245,0.15);
+  }
+  .footer__brand .logo__text strong{color:var(--white);}
+  .footer__brand .logo__text small{color:var(--pale-sky); opacity:0.7;}
+  .footer__brand p{margin-top:1rem; font-size:0.88rem; color:var(--pale-sky); opacity:0.75; max-width:20rem;}
+  .footer__col h3{font-family:var(--font-body); font-size:0.85rem; text-transform:uppercase; letter-spacing:0.06em; color:var(--pearl-aqua); font-weight:600; margin-bottom:1rem;}
+  .footer__col ul{display:flex; flex-direction:column; gap:0.6rem;}
+  .footer__col a{color:var(--pale-sky); text-decoration:none; font-size:0.92rem; opacity:0.85;}
+  .footer__col a:hover{opacity:1; text-decoration:underline;}
+  .footer__bottom{
+    max-width:var(--max); margin:0 auto; padding-top:1.5rem;
+    display:flex; flex-wrap:wrap; justify-content:space-between; gap:0.75rem;
+    font-size:0.8rem; color:var(--pale-sky); opacity:0.6;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 860px){
+    .main-nav{
+      position:fixed; inset:0 0 0 auto; height:100vh; width:min(20rem, 80vw);
+      background:var(--white); flex-direction:column; padding:5.5rem 1.75rem 2rem;
+      transform:translateX(100%); transition:transform 0.2s ease; gap:1.25rem;
+      box-shadow:-12px 0 30px -20px rgba(18,44,52,0.4);
+    }
+    .main-nav.is-open{transform:translateX(0);}
+    .main-nav a{font-size:1.05rem; width:100%;}
+    .nav-toggle{display:block;}
+    .header-actions{display:flex; align-items:center; gap:0.6rem;}
+    .btn-login-label{display:none;}
+    .hero__search{flex-direction:column;}
+    .hero__search button{padding:0.85rem 1.4rem;}
+    .news__item{grid-template-columns:1fr; gap:0.4rem;}
+    .footer__grid{grid-template-columns:1fr 1fr; row-gap:2rem;}
+  }
+  @media (max-width: 520px){
+    .footer__grid{grid-template-columns:1fr;}
+    .utility-bar__inner span{font-size:0.76rem;}
+  }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Ugrás a tartalomra</a>
+
+<div class="utility-bar">
+  <div class="utility-bar__inner">
+    <span>Magyarország hivatalos ügyfélszolgálati platformja — koncepcióterv</span>
+    <nav class="utility-nav" aria-label="Kiegészítő beállítások">
+      <a href="#">Akadálymentes nézet</a>
+      <a href="#">HU</a>
+      <a href="#">EN</a>
+    </nav>
+  </div>
+</div>
+
+<header class="site-header">
+  <div class="site-header__inner">
+    <a class="logo" href="#" aria-label="ÜgyPont, kezdőlap">
+      <svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+        <rect x="1" y="1" width="38" height="38" rx="9" stroke="#3658BF" stroke-width="2"/>
+        <path d="M11 21.5L17 27L29 13" stroke="#7DDEDA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="logo__text">
+        <strong>ÜgyPont</strong>
+        <small>Nemzeti ügyfélszolgálati platform</small>
+      </span>
+    </a>
+
+    <nav class="main-nav" id="main-nav" aria-label="Fő navigáció">
+      <a href="#szolgaltatasok">Szolgáltatások</a>
+      <a href="#elvek">Hogyan működik</a>
+      <a href="#hirek">Közlemények</a>
+      <a href="#kapcsolat">Kapcsolat</a>
+    </nav>
+
+    <div class="header-actions">
+      <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="main-nav" aria-label="Navigáció megnyitása">
+        <span></span>
+      </button>
+      <a class="btn btn-primary" href="#" id="loginBtn">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="5.2" r="2.7" stroke="currentColor" stroke-width="1.4"/><path d="M2.6 14c0.9-3 3-4.5 5.4-4.5s4.5 1.5 5.4 4.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+        <span class="btn-login-label">Bejelentkezés</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <section class="hero">
+    <div class="hero__inner">
+      <p class="tag-code">ÜP · Országos szolgáltatás</p>
+      <h1>Egyszerű ügyintézés.<br><span class="accent">Világos válaszok.</span></h1>
+      <p class="hero__lede">Válassza ki, milyen ügyet szeretne intézni – lépésről lépésre végigvezetjük, közérthetően, hivatali zsargon nélkül.</p>
+      <form class="hero__search" role="search" id="heroSearch">
+        <label for="heroSearchInput" class="sr-only">Ügy vagy szolgáltatás keresése</label>
+        <input type="search" id="heroSearchInput" placeholder="Mit szeretne intézni? Pl. útlevél, lakcímkártya, vállalkozás indítása">
+        <button type="submit">Keresés</button>
+      </form>
+      <div class="hero__quicklinks">
+        <span>Gyakori:</span>
+        <a href="#">Útlevél igénylése</a>
+        <a href="#">Lakcímkártya csere</a>
+        <a href="#">Adóbevallás</a>
+        <a href="#">Vállalkozás indítása</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="services" id="szolgaltatasok">
+    <div class="section__inner">
+      <div class="section__head">
+        <h2>Szolgáltatások ügytípus szerint</h2>
+        <p>Hat fő területre rendezve, hogy elsőre a megfelelő helyen kezdje.</p>
+      </div>
+      <div class="services__grid">
+
+        <article class="service-card">
+          <span class="tag-code">OKM · 01</span>
+          <h3>Okmányok</h3>
+          <p>Személyi igazolvány, útlevél és lakcímkártya igénylése, cseréje és pótlása egy helyen.</p>
+          <a class="card-link" href="#">Ügyintézés indítása →</a>
+        </article>
+
+        <article class="service-card">
+          <span class="tag-code">ADO · 02</span>
+          <h3>Adó és pénzügyek</h3>
+          <p>Bevallás, adószámla-egyenleg és igazolások – jórészt előre kitöltött űrlapokkal.</p>
+          <a class="card-link" href="#">Ügyintézés indítása →</a>
+        </article>
+
+        <article class="service-card">
+          <span class="tag-code">VÁL · 03</span>
+          <h3>Vállalkozás</h3>
+          <p>Cégalapítás, engedélyek és adatszolgáltatás vállalkozóknak és őstermelőknek.</p>
+          <a class="card-link" href="#">Ügyintézés indítása →</a>
+        </article>
+
+        <article class="service-card">
+          <span class="tag-code">CSA · 04</span>
+          <h3>Család és szociális ügyek</h3>
+          <p>Családtámogatások, gyermekvédelmi és szociális ellátások igénylése.</p>
+          <a class="card-link" href="#">Ügyintézés indítása →</a>
+        </article>
+
+        <article class="service-card">
+          <span class="tag-code">EÜ · 05</span>
+          <h3>Egészségügy</h3>
+          <p>Háziorvos-választás, ellátásigazolások és elektronikus egészségügyi szolgáltatások.</p>
+          <a class="card-link" href="#">Ügyintézés indítása →</a>
+        </article>
+
+        <article class="service-card">
+          <span class="tag-code">LAK · 06</span>
+          <h3>Lakhatás</h3>
+          <p>Lakáscélú támogatások, ingatlan-nyilvántartás és albérletbejelentés.</p>
+          <a class="card-link" href="#">Ügyintézés indítása →</a>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <section class="principles" id="elvek">
+    <div class="section__inner">
+      <div class="section__head">
+        <h2>Hogyan dolgozunk</h2>
+        <p>Három elv, amely minden szolgáltatásunkat alakítja.</p>
+      </div>
+      <div class="principles__grid">
+        <div class="principles__item">
+          <span class="tag-num">01</span>
+          <h3>Közérthető nyelven</h3>
+          <p>Minden tájékoztatót hivatali zsargon nélkül, érthetően fogalmazunk meg.</p>
+        </div>
+        <div class="principles__item">
+          <span class="tag-num">02</span>
+          <h3>Nyomon követhető ügymenet</h3>
+          <p>Az ügyszámával bármikor megnézheti, éppen hol tart az ügyintézése.</p>
+        </div>
+        <div class="principles__item">
+          <span class="tag-num">03</span>
+          <h3>Emberi segítség</h3>
+          <p>Ha elakad, élő ügyintézőnk is segít – nem csak egy automata rendszer.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="news" id="hirek">
+    <div class="section__inner">
+      <div class="section__head">
+        <h2>Közlemények</h2>
+        <p>Friss változások az ügyintézésben.</p>
+      </div>
+      <ul class="news__list">
+        <li class="news__item">
+          <time datetime="2026-06-30">2026.06.30</time>
+          <div>
+            <h3>Frissült az online időpontfoglalási rendszer</h3>
+            <p>Rövidebb várakozási idővel és egyértelműbb visszaigazolással működik tovább az időpontfoglalás.</p>
+          </div>
+        </li>
+        <li class="news__item">
+          <time datetime="2026-06-18">2026.06.18</time>
+          <div>
+            <h3>Egyszerűsített űrlapok az okmányirodákban</h3>
+            <p>Kevesebb mezővel és közérthetőbb kitöltési útmutatóval jelentek meg az új nyomtatványok.</p>
+          </div>
+        </li>
+        <li class="news__item">
+          <time datetime="2026-06-02">2026.06.02</time>
+          <div>
+            <h3>Bővült az ügyfélszolgálatok nyitvatartása</h3>
+            <p>Több vidéki irodában is elérhető már a szombat délelőtti ügyfélfogadás.</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="cta-band">
+    <div class="cta-band__inner">
+      <h2>Nem találja, amit keres? Munkatársunk segít.</h2>
+      <a class="btn btn-outline" href="#kapcsolat">Kapcsolatfelvétel →</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer" id="kapcsolat">
+  <div class="footer__grid">
+    <div class="footer__brand">
+      <a class="logo" href="#" aria-label="ÜgyPont, kezdőlap">
+        <svg width="34" height="34" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+          <rect x="1" y="1" width="38" height="38" rx="9" stroke="#7DDEDA" stroke-width="2"/>
+          <path d="M11 21.5L17 27L29 13" stroke="#7DDEDA" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="logo__text">
+          <strong>ÜgyPont</strong>
+          <small>Nemzeti ügyfélszolgálati platform</small>
+        </span>
+      </a>
+      <p>Egyablakos belépési pont az állami ügyintézéshez. Ez az oldal tervezési koncepció, nem hivatalos kormányzati felület.</p>
+    </div>
+
+    <div class="footer__col">
+      <h3>Szolgáltatások</h3>
+      <ul>
+        <li><a href="#szolgaltatasok">Okmányok</a></li>
+        <li><a href="#szolgaltatasok">Adó és pénzügyek</a></li>
+        <li><a href="#szolgaltatasok">Vállalkozás</a></li>
+        <li><a href="#szolgaltatasok">Egészségügy</a></li>
+      </ul>
+    </div>
+
+    <div class="footer__col">
+      <h3>Ügyfeleknek</h3>
+      <ul>
+        <li><a href="#">Gyakori kérdések</a></li>
+        <li><a href="#">Az ügyintézés menete</a></li>
+        <li><a href="#">Panasz benyújtása</a></li>
+        <li><a href="#hirek">Közlemények</a></li>
+      </ul>
+    </div>
+
+    <div class="footer__col">
+      <h3>Jogi információk</h3>
+      <ul>
+        <li><a href="#">Adatvédelmi tájékoztató</a></li>
+        <li><a href="#">Akadálymentesítési nyilatkozat</a></li>
+        <li><a href="#">Impresszum</a></li>
+        <li><a href="#">Süti (cookie) beállítások</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer__bottom">
+    <span>© 2026 ÜgyPont — tervezési koncepció, nem hivatalos oldal</span>
+    <span>ugyfelszolgalat@ugypont.hu · +36 1 234 5678</span>
+  </div>
+</footer>
+
+<script>
+  (function(){
+    var toggle = document.getElementById('navToggle');
+    var nav = document.getElementById('main-nav');
+    if(toggle && nav){
+      toggle.addEventListener('click', function(){
+        var isOpen = nav.classList.toggle('is-open');
+        toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      });
+      nav.querySelectorAll('a').forEach(function(link){
+        link.addEventListener('click', function(){
+          nav.classList.remove('is-open');
+          toggle.setAttribute('aria-expanded', 'false');
+        });
+      });
+    }
+
+    var form = document.getElementById('heroSearch');
+    if(form){
+      form.addEventListener('submit', function(e){ e.preventDefault(); });
+    }
+    var loginBtn = document.getElementById('loginBtn');
+    if(loginBtn){
+      loginBtn.addEventListener('click', function(e){ e.preventDefault(); });
+    }
+  })();
+</script>
+
+</body>
+</html>
